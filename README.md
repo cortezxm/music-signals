@@ -20,8 +20,9 @@
 
 ```bash
 TODO
+```
 
-How it's built. TODO — the pipeline in 3 steps.
+**How it's built.** TODO — the pipeline in 3 steps.
 
-Tests. TODO
+**Tests.** TODO
 
