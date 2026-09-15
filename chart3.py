@@ -23,14 +23,17 @@ ax.barh(high_slots, high.to_numpy(), height=0.65, color="#2a78d6")
 ax.set_yticks(low_slots + high_slots, list(low.index) + list(high.index))
 ax.text(0.005, 10, "⋮ 94 genres in between", va="center", fontsize=9, color="#52514e")
 
-ax.axvline(catalogue, color="#52514e", linestyle="--", linewidth=1.2)
-ax.text(catalogue + 0.01, -1.1, f"whole catalogue {catalogue:.2f}",
+ax.vlines(catalogue, -0.5, 9.5, color="#52514e", linestyle="--", linewidth=1.2)
+ax.vlines(catalogue, 10.5, 20.5, color="#52514e", linestyle="--", linewidth=1.2)
+
+ax.text(catalogue + 0.01, 20.7, f"whole catalogue {catalogue:.2f}",
         color="#52514e", fontsize=9)
 ax.set_xlabel("average size of the hits-vs-ignored gap, across 8 audio features "
               "(standard deviations)")
-ax.set_title("In some genres the sound decides. In others it says nothing.")
-ax.text(0.02, -0.13, "10 highest and 10 lowest of 114 genres; 94 omitted",
-        transform=ax.transAxes, fontsize=8, color="#52514e")
+
+ax.set_title("In some genres the sound decides. In others it says nothing.", loc="left", pad=24)
+ax.text(0, 1.03, "The 10 highest and 10 lowest of 114 genres",
+        transform=ax.transAxes, fontsize=9, color="#52514e")
 for s in ("top", "right", "left"):
     ax.spines[s].set_visible(False)
 fig.tight_layout()
