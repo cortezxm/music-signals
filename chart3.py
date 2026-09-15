@@ -12,10 +12,17 @@ by_genre = pd.Series({g: mean_abs_gap(sub)
                       for g, sub in tracks.groupby("track_genre")}).sort_values()
 catalogue = mean_abs_gap(tracks)
 
-shown = pd.concat([by_genre.head(10), by_genre.tail(10)])
+low = by_genre.head(10)
+high = by_genre.tail(10)
+low_slots = list(range(0, 10))
+high_slots = list(range(11, 21))
 
 fig, ax = plt.subplots(figsize=(8, 7))
-ax.barh(shown.index, shown.to_numpy(), height=0.65, color="#2a78d6")
+ax.barh(low_slots, low.to_numpy(), height=0.65, color="#2a78d6")
+ax.barh(high_slots, high.to_numpy(), height=0.65, color="#2a78d6")
+ax.set_yticks(low_slots + high_slots, list(low.index) + list(high.index))
+ax.text(0.005, 10, "⋮ 94 genres in between", va="center", fontsize=9, color="#52514e")
+
 ax.axvline(catalogue, color="#52514e", linestyle="--", linewidth=1.2)
 ax.text(catalogue + 0.01, -1.1, f"whole catalogue {catalogue:.2f}",
         color="#52514e", fontsize=9)
