@@ -1,23 +1,21 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-df = pd.read_csv("data/spotify_tracks.csv")
-df = df[df["popularity"] > 0]
+from signals import drop_missing_popularity, load_tracks, standardized_gap
+
+tracks = drop_missing_popularity(load_tracks("data/spotify_tracks.csv"))
 
 GENRES = ["edm", "metal", "reggaeton", "country", "jazz", "acoustic"]
 
-def gap(frame, feature):
-    lo, hi = frame["popularity"].quantile([0.25, 0.75])
-    top = frame[frame["popularity"] >= hi]
-    bottom = frame[frame["popularity"] <= lo]
-    return (top[feature].mean() - bottom[feature].mean()) / frame[feature].std()
+def loudness_gap(tracks: pd.DataFrame) -> float:
+    return standardized_gap(tracks, ["loudness"])["loudness"]
 
-loud = pd.Series({g: gap(df[df["track_genre"] == g], "loudness")
+loud = pd.Series({g: loudness_gap(tracks[tracks["track_genre"] == g])
                   for g in GENRES}).sort_values()
-catalogue = gap(df, "loudness")
+catalogue = loudness_gap(tracks)
 
 fig, ax = plt.subplots(figsize=(8, 4.5))
-ax.barh(loud.index, loud.values, height=0.6,
+ax.barh(loud.index, loud.to_numpy(), height=0.6,
         color=["#e34948" if v < 0 else "#2a78d6" for v in loud])
 ax.axvline(0, color="#52514e", linewidth=1)
 ax.axvline(catalogue, color="#52514e", linestyle="--", linewidth=1.2)

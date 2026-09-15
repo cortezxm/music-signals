@@ -1,27 +1,21 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-df = pd.read_csv("data/spotify_tracks.csv")
-df = df[df["popularity"] > 0]
+from signals import FEATURES, drop_missing_popularity, load_tracks, standardized_gap
 
-FEATURES = ["danceability", "energy", "loudness", "valence",
-            "acousticness", "speechiness", "tempo", "duration_ms"]
+tracks = drop_missing_popularity(load_tracks("data/spotify_tracks.csv"))
 
-def mean_abs_gap(frame):
-    lo, hi = frame["popularity"].quantile([0.25, 0.75])
-    top = frame[frame["popularity"] >= hi]
-    bottom = frame[frame["popularity"] <= lo]
-    return ((top[FEATURES].mean() - bottom[FEATURES].mean())
-            / frame[FEATURES].std()).abs().mean()
+def mean_abs_gap(tracks: pd.DataFrame) -> float:
+    return standardized_gap(tracks, FEATURES).abs().mean()
 
 by_genre = pd.Series({g: mean_abs_gap(sub)
-                      for g, sub in df.groupby("track_genre")}).sort_values()
-catalogue = mean_abs_gap(df)
+                      for g, sub in tracks.groupby("track_genre")}).sort_values()
+catalogue = mean_abs_gap(tracks)
 
 shown = pd.concat([by_genre.head(10), by_genre.tail(10)])
 
 fig, ax = plt.subplots(figsize=(8, 7))
-ax.barh(shown.index, shown.values, height=0.65, color="#2a78d6")
+ax.barh(shown.index, shown.to_numpy(), height=0.65, color="#2a78d6")
 ax.axvline(catalogue, color="#52514e", linestyle="--", linewidth=1.2)
 ax.text(catalogue + 0.01, -1.1, f"whole catalogue {catalogue:.2f}",
         color="#52514e", fontsize=9)
