@@ -18,9 +18,13 @@ low_slots = list(range(0, 10))
 high_slots = list(range(11, 21))
 
 fig, ax = plt.subplots(figsize=(8, 7))
-ax.barh(low_slots, low.to_numpy(), height=0.65, color="#2a78d6")
+ax.barh(low_slots, low.to_numpy(), height=0.65, color="#d9d9d6")
 ax.barh(high_slots, high.to_numpy(), height=0.65, color="#2a78d6")
 ax.set_yticks(low_slots + high_slots, list(low.index) + list(high.index))
+
+for label in ax.get_yticklabels()[:10]:
+    label.set_color("#9a9a97")
+
 ax.text(0.005, 10, "⋮ 94 genres in between", va="center", fontsize=9, color="#52514e")
 
 ax.vlines(catalogue, -0.5, 9.5, color="#52514e", linestyle="--", linewidth=1.2)
