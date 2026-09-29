@@ -1,6 +1,6 @@
 import pandas as pd 
-from signals import drop_missing_popularity
-from signals import split_hits_ignored
+import pytest
+from signals import drop_missing_popularity, split_hits_ignored, standardized_gap
 
 def test_drop_missing_popularity_removes_zero_rows():
 	tracks = pd.DataFrame({"popularity": [0, 40, 0, 70]})
@@ -24,3 +24,18 @@ def test_split_hits_ignored_all_equal_lands_in_both():
 	assert list(hits["popularity"]) == [50, 50, 50, 50, 50]
 	assert list(ignored["popularity"]) == [50, 50, 50, 50, 50]
 
+def test_standardized_gap_hits_vs_ignored_in_std_units():
+	tracks = pd.DataFrame({
+			"popularity": [10, 20, 30, 40, 50],
+			"energy": [0, 0, 1, 2, 2],
+		})
+	result = standardized_gap(tracks, ["energy"])
+	assert result["energy"] == pytest.approx(2.0)
+
+def test_standardized_gap_no_spread_returns_nan():
+	tracks = pd.DataFrame({
+			"popularity": [10, 20, 30, 40, 50],
+			"energy": [10, 10, 10, 10, 10]
+		})
+	result = standardized_gap(tracks, ["energy"])
+	assert pd.isna(result["energy"])
