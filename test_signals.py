@@ -1,6 +1,6 @@
 import pandas as pd 
 import pytest
-from signals import drop_missing_popularity, split_hits_ignored, standardized_gap
+from signals import drop_missing_popularity, split_hits_ignored, standardized_gap, load_tracks
 
 def test_drop_missing_popularity_removes_zero_rows():
 	tracks = pd.DataFrame({"popularity": [0, 40, 0, 70]})
@@ -39,3 +39,16 @@ def test_standardized_gap_no_spread_returns_nan():
 		})
 	result = standardized_gap(tracks, ["energy"])
 	assert pd.isna(result["energy"])
+
+def test_load_tracks_reads_csv_into_table(tmp_path):
+	file = tmp_path / "tracks.csv"
+	file.write_text("popularity,energy\n40,0.5\n70,0.9\n")
+	result = load_tracks(file)
+	assert len(result) == 2
+
+def test_load_tracks_missing_files_raises(tmp_path):
+	missing = tmp_path / "does_not_exist.csv"
+	with pytest.raises(FileNotFoundError):
+		load_tracks(missing)
+
+	
